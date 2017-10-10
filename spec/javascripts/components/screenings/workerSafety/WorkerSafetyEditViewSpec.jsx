@@ -45,8 +45,12 @@ describe('WorkerSafetyEditView', () => {
   })
 
   it('renders the additional safety field', () => {
-    expect(component.find('label[htmlFor="safety_information"]').text()).toEqual('Additional safety information')
-    expect(component.find('textarea').props().value).toEqual('Be careful!')
+    expect(component.find('TextField').props()).toEqual({
+      id: 'safety_information',
+      label: 'Additional safety information',
+      onChange: jasmine.any(Function),
+      value: 'Be careful!',
+    })
   })
   it('renders save/cancel buttons', () => {
     expect(component.find('button.btn-primary').text()).toEqual('Save')

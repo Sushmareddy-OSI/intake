@@ -1,24 +1,20 @@
-import FormField from 'common/FormField'
 import PropTypes from 'prop-types'
 import React from 'react'
+import TextField from 'common/TextField'
 
 const NarrativeEditView = ({errors, screening, onBlur, onCancel, onChange, onSave}) => (
   <div className='card-body'>
     <div className='row'>
-      <FormField
+      <TextField
         errors={errors.report_narrative}
         gridClassName='col-md-12'
         id='report_narrative'
         label='Report Narrative'
+        onBlur={(event) => onBlur(event)}
+        onChange={(event) => onChange(['report_narrative'], event.target.value || null)}
         required
-      >
-        <textarea
-          id='report_narrative'
-          onChange={(event) => onChange(['report_narrative'], event.target.value || null)}
-          onBlur={(event) => onBlur(event)}
-          required value={screening.get('report_narrative') || ''}
-        />
-      </FormField>
+        value={screening.get('report_narrative') || ''}
+      />
     </div>
     <div className='row'>
       <div className='centered'>

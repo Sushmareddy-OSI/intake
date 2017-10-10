@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import SAFETY_ALERT from 'enums/SafetyAlert'
 import Select from 'react-select'
+import TextField from 'common/TextField'
 import selectOptions from 'utils/selectHelper'
 
 export default class WorkerSafetyEditView extends React.Component {
@@ -30,9 +31,9 @@ export default class WorkerSafetyEditView extends React.Component {
         </div>
         <div className='row'>
           <div className='col-md-12'>
-            <label className='no-gap' htmlFor='safety_information'>Additional safety information</label>
-            <textarea
+            <TextField
               id='safety_information'
+              label='Additional safety information'
               onChange={(event) => this.props.onChange(['safety_information'], event.target.value || null)}
               value={this.props.safetyInformation || ''}
             />

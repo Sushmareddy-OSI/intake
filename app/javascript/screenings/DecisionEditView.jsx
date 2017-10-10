@@ -2,6 +2,7 @@ import * as IntakeConfig from 'common/config'
 import InputField from 'common/InputField'
 import PropTypes from 'prop-types'
 import React from 'react'
+import TextField from 'common/TextField'
 import SCREENING_DECISION from 'enums/ScreeningDecision'
 import ACCESS_RESTRICTIONS from 'enums/AccessRestrictions'
 import SCREENING_DECISION_OPTIONS from 'enums/ScreeningDecisionOptions'
@@ -65,14 +66,12 @@ const DecisionEditView = ({errors, screening, onCancel, onSave, onChange, onBlur
                 maxLength='64'
               />
           }
-          <div>
-            <label htmlFor='additional_information'>Additional information</label>
-            <textarea
-              id='additional_information'
-              onChange={(event) => onChange(['additional_information'], event.target.value || null)}
-              value={screening.get('additional_information') || ''}
-            />
-          </div>
+          <TextField
+            id='additional_information'
+            label= 'Additional information'
+            onChange={(event) => onChange(['additional_information'], event.target.value || null)}
+            value={screening.get('additional_information') || ''}
+          />
           <SelectField
             id='access_restrictions'
             label= 'Access Restrictions'
@@ -83,16 +82,15 @@ const DecisionEditView = ({errors, screening, onCancel, onSave, onChange, onBlur
             {Object.keys(ACCESS_RESTRICTIONS).map((item) => <option key={item} value={item}>{ACCESS_RESTRICTIONS[item]}</option>)}
           </SelectField>
           { isRestricted &&
-                <div>
-                  <label className='required' htmlFor='restrictions_rationale'>Restrictions Rationale</label>
-                  <textarea
-                    id='restrictions_rationale'
-                    onChange={(event) => onChange(['restrictions_rationale'], event.target.value || null)}
-                    value={screening.get('restrictions_rationale') || ''}
-                    onBlur={() => onBlur('restrictions_rationale')}
-                    maxLength='255'
-                  />
-                </div>
+                <TextField
+                  id='restrictions_rationale'
+                  label= 'Restrictions Rationale'
+                  maxLength='255'
+                  onBlur={() => onBlur('restrictions_rationale')}
+                  onChange={(event) => onChange(['restrictions_rationale'], event.target.value || null)}
+                  required
+                  value={screening.get('restrictions_rationale') || ''}
+                />
           }
         </div>
         <div className='col-md-6'>

@@ -165,7 +165,7 @@ describe('DecisionEditView', () => {
     expect(component.find('InputField[label="Service name"]').props().value)
       .toEqual('Name of the service')
     expect(component.find('SelectField[label="Category"]').exists()).toEqual(false)
-    expect(component.find('textarea#additional_information').props().value)
+    expect(component.find('TextField[label="Additional information"]').props().value)
       .toEqual('more info')
     expect(component.find('SelectField[label="Access Restrictions"]').exists()).toEqual(true)
   })
