@@ -23,6 +23,9 @@ const DecisionShowView = ({screening, errors}) => {
     }
   })()
 
+  const isAdditionalInformationRequired =
+    screening.get('screening_decision') === 'screen_out' && screening.get('screening_decision_detail') === 'evaluate_out'
+
   return (
     <div className='card-body'>
       <div className='row'>
@@ -37,7 +40,9 @@ const DecisionShowView = ({screening, errors}) => {
           >
             {decisionDetailText}
           </ShowField>
-          <ShowField label='Additional information'>
+          <ShowField label='Additional information'
+            required = {isAdditionalInformationRequired}
+          >
             {screening.get('additional_information')}
           </ShowField>
           <ShowField label='Access Restrictions'>

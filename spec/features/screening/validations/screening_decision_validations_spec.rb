@@ -7,11 +7,15 @@ feature 'Screening Decision Validations' do
   let(:error_message) { 'Please enter at least one allegation to promote to referral.' }
   let(:perpetrator) { FactoryGirl.create(:participant, :perpetrator) }
   let(:victim) { FactoryGirl.create(:participant, :victim) }
+  let(:screening_decision_detail) { nil }
+  let(:additional_information) { nil }
   let(:screening) do
     FactoryGirl.create(
       :screening,
+      additional_information: additional_information,
       participants: [perpetrator, victim],
-      screening_decision: screening_decision
+      screening_decision: screening_decision,
+      screening_decision_detail: screening_decision_detail
     )
   end
 
@@ -201,6 +205,32 @@ feature 'Screening Decision Validations' do
 
         within '#decision-card.show' do
           expect(page).to have_content(error_message)
+        end
+      end
+    end
+
+    context 'when screening decision is "Screen out" and category is "Evaluate out"' do
+      let(:screening_decision) { 'screen_out' }
+      let(:screening_decision_detail) { 'evaluate_out' }
+      let(:error_message) { 'Please enter additional information' }
+
+      context 'when additional information is not populated' do
+        scenario 'additional information is marked as a required field' do
+          within '#decision-card.show' do
+            expect(page.find('label', text: 'Additional information')).to match_css('.required')
+          end
+        end
+      end
+    end
+
+    context 'when additional information is populated' do
+      let(:additional_information) { 'evaluate out info' }
+      let(:screening_decision) { 'screen_out' }
+      let(:screening_decision_detail) { 'evaluate_out' }
+
+      scenario 'additional information is marked as a required field' do
+        within '#decision-card.show' do
+          expect(page.find('label', text: 'Additional information')).to match_css('.required')
         end
       end
     end

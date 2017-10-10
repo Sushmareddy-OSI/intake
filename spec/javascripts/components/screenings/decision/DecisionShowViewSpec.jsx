@@ -27,6 +27,34 @@ describe('DecisionShowView', () => {
       .toEqual(true)
   })
 
+  it('does not render the additional information label as required if screening decision detail is not "Evaluate out"', () => {
+    component = shallow(
+      <DecisionShowView
+        screening={Immutable.fromJS({
+          screening_decision: 'screen_out',
+          screening_decision_detail: 'screen_in',
+        })}
+        onEdit={onEdit}
+        errors={errors}
+      />
+    )
+    expect(component.find('ShowField[label="Additional information"]').props().required).toBe(false)
+  })
+
+  it('renders the additional information label as required when screening decision detail is "Evaluate out"', () => {
+    component = shallow(
+      <DecisionShowView
+        screening={Immutable.fromJS({
+          screening_decision: 'screen_out',
+          screening_decision_detail: 'evaluate_out',
+        })}
+        onEdit={onEdit}
+        errors={errors}
+      />
+    )
+    expect(component.find('ShowField[label="Additional information"]').props().required).toBe(true)
+  })
+
   it('renders the SDM link', () => {
     const sdm_link = component.find('#complete_sdm')
     expect(component.text()).toContain('SDM Hotline Tool')
