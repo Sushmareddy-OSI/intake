@@ -22,6 +22,9 @@ const DecisionEditView = ({errors, screening, onCancel, onSave, onChange, onBlur
     })
   }
 
+  const isAdditionalInformationRequired =
+    screening.get('screening_decision') === 'screen_out' && screening.get('screening_decision_detail') === 'evaluate_out'
+
   return (
     <div className='card-body'>
       <div className='row'>
@@ -70,6 +73,7 @@ const DecisionEditView = ({errors, screening, onCancel, onSave, onChange, onBlur
             id='additional_information'
             label= 'Additional information'
             onChange={(event) => onChange(['additional_information'], event.target.value || null)}
+            required={isAdditionalInformationRequired}
             value={screening.get('additional_information') || ''}
           />
           <SelectField

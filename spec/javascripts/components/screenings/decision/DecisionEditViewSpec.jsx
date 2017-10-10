@@ -159,6 +159,16 @@ describe('DecisionEditView', () => {
       .toEqual(true)
   })
 
+  it('renders the additional information label as required when screening decision detail is "Evaluate out"', () => {
+    props.screening = Immutable.fromJS({
+      screening_decision: 'screen_out',
+      screening_decision_detail: 'evaluate_out',
+    })
+    component = shallow(<DecisionEditView {...props} />)
+    expect(component.find('TextField[label="Additional information"]').props().required)
+      .toBe(true)
+  })
+
   it('renders the input fields', () => {
     expect(component.find('SelectField[label="Screening Decision"]').props().value)
       .toEqual('differential_response')

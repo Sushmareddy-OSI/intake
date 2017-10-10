@@ -135,6 +135,23 @@ feature 'Screening Decision Validations' do
         end
       end
     end
+
+    context 'when screening decision is "Screen out" and category is "Evaluate out"' do
+      let(:error_message) { 'Please enter additional information' }
+
+      scenario 'additional information is a required field' do
+        within '#decision-card.edit' do
+          expect(page.find('label', text: 'Additional information')).not_to match_css('.required')
+          expect(page.find_field('additional_information')[:required]).to eq nil
+          select 'Screen out', from: 'Screening Decision'
+          expect(page.find('label', text: 'Additional information')).not_to match_css('.required')
+          expect(page.find_field('additional_information')[:required]).to eq nil
+          select 'Evaluate out', from: 'Category'
+          expect(page.find_field('additional_information')[:required]).to eq 'true'
+          expect(page.find('label', text: 'Additional information')).to match_css('.required')
+        end
+      end
+    end
   end
 
   context 'When page is opened in show view' do
