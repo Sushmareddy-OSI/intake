@@ -22,7 +22,7 @@ describe('DecisionShowView', () => {
     )
   })
 
-  it('renders the report narrative label as required', () => {
+  it('renders the screening decision label as required', () => {
     expect(component.find('ShowField[label="Screening Decision"]').props().required)
       .toEqual(true)
   })

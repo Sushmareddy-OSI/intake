@@ -154,7 +154,7 @@ describe('DecisionEditView', () => {
     expect(props.onBlur).toHaveBeenCalledWith('screening_decision_detail')
   })
 
-  it('renders the report narrative label as required', () => {
+  it('renders the Screening Decision label as required', () => {
     expect(component.find('SelectField[label="Screening Decision"]').props().required)
       .toEqual(true)
   })
