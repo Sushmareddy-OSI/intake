@@ -155,6 +155,18 @@ feature 'Screening Decision Validations' do
           expect(page.find('label', text: 'Additional information')).to match_css('.required')
         end
       end
+
+      scenario 'Error message doesnt display until user blurs out additional information field' do
+        within '#decision-card.edit' do
+          expect(page).not_to have_content(error_message)
+          select 'Screen out', from: 'Screening Decision'
+          select 'Evaluate out', from: 'Category'
+          fill_in 'Additional information', with: ''
+          expect(page).not_to have_content(error_message)
+          blur_field
+          expect(page).to have_content(error_message)
+        end
+      end
     end
   end
 
@@ -220,6 +232,12 @@ feature 'Screening Decision Validations' do
             expect(page.find('label', text: 'Additional information')).to match_css('.required')
           end
         end
+
+        scenario 'additional information has an error message' do
+          within '#decision-card.show' do
+            expect(page).to have_content(error_message)
+          end
+        end
       end
     end
 
@@ -231,6 +249,12 @@ feature 'Screening Decision Validations' do
       scenario 'additional information is marked as a required field' do
         within '#decision-card.show' do
           expect(page.find('label', text: 'Additional information')).to match_css('.required')
+        end
+      end
+
+      scenario 'additional information has no error message' do
+        within '#decision-card.show' do
+          expect(page).not_to have_content(error_message)
         end
       end
     end
