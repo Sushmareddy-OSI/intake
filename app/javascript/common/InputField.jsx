@@ -50,10 +50,7 @@ const InputField = ({
   )
 }
 
-InputField.defaultProps = {
-  type: 'text',
-  mask: '',
-}
+InputField.defaultProps = {type: 'text'}
 
 InputField.propTypes = {
   allowCharacters: PropTypes.instanceOf(RegExp),
