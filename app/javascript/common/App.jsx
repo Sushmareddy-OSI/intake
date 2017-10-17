@@ -8,7 +8,8 @@ import PageError from 'common/PageError'
 
 export class App extends React.Component {
   componentDidMount() {
-    this.props.actions.fetch()
+    this.props.actions.fetch() //fetch system codes
+    // call the initial google analytics action
   }
   render() {
     const hasRemoteError = this.props.remoteError && Object.keys(this.props.remoteError).length > 0

@@ -59,11 +59,13 @@ describe('HomePage', () => {
 
     describe('when a user creates a new screening', () => {
       let createScreening
+      let trackEvent
       beforeEach(() => {
         createScreening = jasmine.createSpy('createScreening')
+        trackEvent = jasmine.createSpy('trackEvent')
         component = shallow(
           <HomePage
-            actions={{createScreening}}
+            actions={{createScreening, trackEvent}}
             screening={Map({id: '1'})}
             router={{}}
           />
@@ -74,6 +76,10 @@ describe('HomePage', () => {
 
       it('calls the create screening action', () => {
         expect(createScreening).toHaveBeenCalled()
+      })
+
+      it('dispatches an analytics track event action', () => {
+        expect(trackEvent).toHaveBeenCalledWith({category: 'Screening', action: 'Create'})
       })
     })
   })
