@@ -32,6 +32,7 @@ import '../../assets/stylesheets/multi-select'
 import '../../assets/stylesheets/ie'
 import '../../assets/stylesheets/google-api'
 import '../../assets/stylesheets/page-error'
+import '../../assets/stylesheets/print'
 
 if (document.getElementById('app')) {
   ReactDOM.render(routes, document.getElementById('app'))

@@ -62,7 +62,7 @@ export class ScreeningPage extends React.Component {
           }
           {
             releaseTwo &&
-              <div className='card edit double-gap-top' id='snapshot-card'>
+              <div className='card edit double-gap-top hidden-print' id='snapshot-card'>
                 <div className='card-body'>
                   <div className='row'>
                     <div className='col-md-12'>
@@ -109,14 +109,14 @@ export class ScreeningPage extends React.Component {
           }
           {
             releaseTwo &&
-            <div className='row double-gap-top'>
+            <div className='row double-gap-top hidden-print'>
               <div className='centered'>
                 <Link to='/' className='btn btn-primary'>Start Over</Link>
               </div>
             </div>
           }
           { mode === 'show' &&
-            <div>
+            <div className='hidden-print'>
               <Link to='/' className='gap-right'>Home</Link>
               {this.props.editable && <Link to={`/screenings/${this.props.params.id}/edit`}>Edit</Link>}
             </div>

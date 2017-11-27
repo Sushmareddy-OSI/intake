@@ -4,7 +4,7 @@ import Autocompleter from 'common/Autocompleter'
 import CreateUnknownParticipant from 'screenings/CreateUnknownParticipant'
 
 const PersonSearchForm = ({canCreateNewPerson, isSelectable, onSelect}) => (
-  <div className='card edit double-gap-top' id='search-card'>
+  <div className='card edit double-gap-top hidden-print' id='search-card'>
     <div className='card-header'>
       <span>Search</span>
     </div>

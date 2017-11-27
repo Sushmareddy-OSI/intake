@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 
 const PageError = ({errorCount}) => (
-  <div className='page-error'>
+  <div className='page-error hidden-print'>
     <div className='container'>
       <div className='row'>
         <p className='text-center'>

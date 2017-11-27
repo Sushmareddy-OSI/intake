@@ -3,7 +3,7 @@ import React from 'react'
 
 const ScreeningSubmitButton = ({actions, params}) => (
   <div className='row'>
-    <div className='centered double-gap-top double-gap-bottom'>
+    <div className='centered double-gap-top double-gap-bottom hidden-print'>
       <button
         className='btn btn-primary'
         onClick={() => actions.submitScreening(params.id)}

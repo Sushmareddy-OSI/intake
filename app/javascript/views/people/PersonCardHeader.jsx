@@ -8,7 +8,7 @@ const PersonCardHeader = ({informationFlag, title, onDelete, onEdit, showDelete,
     { informationFlag && <span className='information-flag'>{informationFlag}</span>}
     { showDelete &&
       <button aria-label='Delete person'
-        className='pull-right btn btn-warning'
+        className='pull-right btn btn-warning hidden-print'
         onClick={onDelete}
       >
         Delete
