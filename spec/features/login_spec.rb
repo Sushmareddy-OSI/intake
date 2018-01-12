@@ -122,11 +122,8 @@ feature 'login' do
 
   scenario 'user uses session access code when communicating to API' do
     screening = FactoryGirl.create(:screening, name: 'My Screening')
-    stub_request(:get, intake_api_url(ExternalRoutes.intake_api_screening_path(screening.id)))
-      .and_return(json_body(screening.to_json, status: 200))
     stub_request(:get, intake_api_url(ExternalRoutes.intake_api_screenings_path))
       .and_return(json_body([].to_json, status: 200))
-    stub_empty_history_for_screening(screening)
 
     bobs_access_code = 'BOBS_ACCESS_CODE'
     bobs_token = 'BOBS_TOKEN'
@@ -149,6 +146,7 @@ feature 'login' do
     end
 
     Capybara.using_session(:bob) do
+      stub_screening_page(screening)
       visit screening_path(screening.id)
       expect(page).to have_content 'My Screening'
       expect(
@@ -158,6 +156,7 @@ feature 'login' do
     end
 
     Capybara.using_session(:alex) do
+      stub_screening_page(screening)
       visit screening_path(screening.id)
       expect(page).to have_content 'My Screening'
       expect(

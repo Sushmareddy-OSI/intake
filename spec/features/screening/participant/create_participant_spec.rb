@@ -372,6 +372,10 @@ feature 'Create participant' do
       scenario 'cannot add sensitive' do
         Feature.run_with_activated(:authentication) do
           stub_empty_history_for_screening(existing_screening)
+          stub_request(:post,
+            intake_api_url(ExternalRoutes.intake_api_screening_people_path(existing_screening.id)))
+            .and_return(json_body({}.to_json, status: 201))
+
           visit edit_screening_path(id: existing_screening.id, token: insensitive_token)
           within '#search-card', text: 'Search' do
             fill_in_autocompleter 'Search for any person', with: 'Marge'
