@@ -238,6 +238,7 @@ feature 'Screening Decision Validations' do
       scenario 'do not show error on restriction_rationale' do
         blur_field
         should_not_have_content error_message, inside: '#decision-card.edit'
+        stub_screening_put_request_with_anything_and_return(screening)
         save_card('decision')
         should_not_have_content error_message, inside: '#decision-card .card-body'
       end

@@ -274,6 +274,7 @@ feature 'Edit Screening' do
       ).and_return(json_body(existing_screening.to_json, status: 200))
       stub_empty_relationships_for_screening(existing_screening)
       stub_empty_history_for_screening(existing_screening)
+      stub_county_agencies('c42')
       visit edit_screening_path(id: existing_screening.id)
 
       within '#snapshot-card' do
@@ -445,7 +446,7 @@ feature 'individual card save' do
     stub_request(
       :put, intake_api_url(ExternalRoutes.intake_api_screening_path(existing_screening.id))
     ).with(json_body(as_json_without_root_id(existing_screening)))
-      .and_return(json_body(existing_screening.to_json))
+      .and_return({}.to_json)
     stub_empty_relationships_for_screening(existing_screening)
     stub_empty_history_for_screening(existing_screening)
 
