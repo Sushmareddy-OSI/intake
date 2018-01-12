@@ -56,7 +56,12 @@ feature 'Edit Investigation Contact' do
   scenario 'user can edit an existing contact' do
     stub_request(
       :put,
-      ferb_api_url(ExternalRoutes.ferb_api_investigations_contact_path('existing_investigation_id', 'existing_contact_id'))
+      ferb_api_url(
+        ExternalRoutes.ferb_api_investigations_contact_path(
+          'existing_investigation_id',
+          'existing_contact_id'
+        )
+      )
     ).and_return(
       json_body({}.to_json, status: 201)
     )
