@@ -21,7 +21,7 @@ describe('PersonInformationForm', () => {
       ssn,
       ...args,
     }
-    return shallow(<PersonInformationForm {...props}/>)
+    return shallow(<PersonInformationForm {...props}/>, {disableLifecycleMethods: true})
   }
 
   it('renders the legacySourceDescription', () => {

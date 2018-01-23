@@ -30,7 +30,7 @@ describe('ScreeningPage when release two is active', () => {
       reference,
       referralId,
     }
-    return shallow(<ScreeningPage {...props} />)
+    return shallow(<ScreeningPage {...props} />, {disableLifecycleMethods: true})
   }
 
   describe('Edit mode', () => {

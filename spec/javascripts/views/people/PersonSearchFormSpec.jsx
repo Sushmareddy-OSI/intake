@@ -31,7 +31,7 @@ describe('PersonSearchForm', () => {
         results={results}
         searchTerm=''
         total={total}
-      />
+      />, {disableLifecycleMethods: true}
     )
   }
 

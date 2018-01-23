@@ -26,7 +26,7 @@ describe('PersonCard', () => {
       personId,
       personName,
     }
-    return shallow(<PersonCard {...props}/>)
+    return shallow(<PersonCard {...props}/>, {disableLifecycleMethods: true})
   }
 
   describe('when release two is active', () => {
@@ -85,7 +85,7 @@ describe('PersonCard', () => {
             personId='1234'
             personName='Bob Smith'
             show={<p>Showing</p>}
-          />
+          />, {disableLifecycleMethods: true}
         )
         expect(component.find('.card-body').children('p').at(0).text()).toEqual('Showing')
       })
@@ -137,7 +137,7 @@ describe('PersonCard', () => {
             personId='1234'
             personName='Bob Smith'
             show={<p>Showing</p>}
-          />
+          />, {disableLifecycleMethods: true}
         )
         expect(component.find('.card-body').children('p').at(0).text()).toEqual('Editing')
       })

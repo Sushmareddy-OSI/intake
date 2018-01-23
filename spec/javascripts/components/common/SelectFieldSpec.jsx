@@ -21,7 +21,7 @@ describe('SelectField', () => {
     props.onChange = onChange
     props.onBlur = onBlur
     component = shallow(
-      <SelectField {...props}><option/></SelectField>
+      <SelectField {...props}><option/></SelectField>, {disableLifecycleMethods: true}
     )
     formField = component.find('FormField')
   })
@@ -43,7 +43,7 @@ describe('SelectField', () => {
 
   it('renders the select element value with empty string when value is null', () => {
     const propsWithNullValue = Object.assign(props, {value: null})
-    component = shallow(<SelectField {...propsWithNullValue}/>)
+    component = shallow(<SelectField {...propsWithNullValue}/>, {disableLifecycleMethods: true})
     const inputElement = component.find('select')
     expect(inputElement.length).toEqual(1)
     expect(inputElement.props().value).toEqual('')
@@ -80,7 +80,7 @@ describe('SelectField', () => {
         value: 'this-is-my-value',
         onChange: onChange,
       }
-      component = shallow(<SelectField {...props}/>)
+      component = shallow(<SelectField {...props}/>, {disableLifecycleMethods: true})
       expect(component.find('FormField').props().required).toEqual(true)
       expect(component.find('select').prop('required')).toEqual(true)
       expect(component.find('select').prop('aria-required')).toEqual(true)
