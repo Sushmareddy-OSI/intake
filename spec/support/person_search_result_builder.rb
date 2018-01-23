@@ -52,7 +52,7 @@ class PersonSearchResultBuilder
   end
 
   def with_date_of_birth(dob)
-    @search_result[:_source][:date_of_birth] = dob.to_s(:db)
+    @search_result[:_source][:date_of_birth] = dob
   end
 
   def with_ssn(ssn)
