@@ -16,6 +16,7 @@ describe('CrossReportForm', () => {
       DISTRICT_ATTORNEY: [],
       LAW_ENFORCEMENT: [],
     },
+    departmentOfJustice,
     districtAttorney = {
       selected: false,
       touched: false,
@@ -70,6 +71,7 @@ describe('CrossReportForm', () => {
       counties,
       county_id,
       countyAgencies,
+      departmentOfJustice,
       districtAttorney,
       errors,
       lawEnforcement,
@@ -236,6 +238,46 @@ describe('CrossReportForm', () => {
       expect(field.props().actions).toEqual(actions)
       expect(field.props().errors).toEqual(['le is missing'])
     })
+    it('renders DEPARTMENT_OF_JUSTICE agency field if departmentOfJustice is passed', () => {
+      const component = renderCrossReportForm({
+        county_id: '12',
+        departmentOfJustice: {selected: true, agency: {value: '1234'}},
+        countyAgencies: {
+          COMMUNITY_CARE_LICENSING: [],
+          COUNTY_LICENSING: [],
+          DEPARTMENT_OF_JUSTICE: [{id: '123', value: 'asdf'}],
+          DISTRICT_ATTORNEY: [],
+          LAW_ENFORCEMENT: [],
+        },
+        errors: {
+          DEPARTMENT_OF_JUSTICE: ['doj is missing'],
+        },
+        actions,
+      })
+      const field = component.find('CrossReportAgencyField[type="DEPARTMENT_OF_JUSTICE"]')
+      expect(field.props().selected).toEqual(true)
+      expect(field.props().value).toEqual('1234')
+      expect(field.props().countyAgencies).toEqual([{id: '123', value: 'asdf'}])
+      expect(field.props().actions).toEqual(actions)
+      expect(field.props().errors).toEqual(['doj is missing'])
+    })
+    it('does not render DEPARTMENT_OF_JUSTICE agency field if departmentOfJustice is not passed', () => {
+      const component = renderCrossReportForm({
+        county_id: '12',
+        countyAgencies: {
+          COMMUNITY_CARE_LICENSING: [],
+          COUNTY_LICENSING: [],
+          DISTRICT_ATTORNEY: [],
+          LAW_ENFORCEMENT: [],
+        },
+        errors: {
+          DEPARTMENT_OF_JUSTICE: ['doj is missing'],
+        },
+        actions,
+      })
+      expect(component.find('CrossReportAgencyField[type="DEPARTMENT_OF_JUSTICE"]').exists()).toBe(false)
+    })
+
     it('renders COUNTY_LICENSING agency field', () => {
       const component = renderCrossReportForm({
         county_id: '12',
