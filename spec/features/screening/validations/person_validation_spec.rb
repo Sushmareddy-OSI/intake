@@ -11,6 +11,210 @@ feature 'Person Information Validations' do
     stub_and_visit_edit_screening(screening)
   end
 
+  context 'Age validation for Roles' do
+    let(:screening) do
+      FactoryGirl.create :screening,
+        participants: [person],
+        started_at: Time.new(2018, 12, 13)
+    end
+
+    context 'Alleged victims age is not under 18 years based on approximate age with unit' do
+      let(:invalid_date_of_birth) { nil }
+      let(:invalid_approximate_age) { nil }
+      let(:valid_approximate_age) { '96' }
+      let(:invalid_approximate_age_units) { 'years' }
+      let(:valid_approximate_age_units) { 'weeks' }
+      let(:person) do
+        FactoryGirl.create :participant,
+          date_of_birth: invalid_date_of_birth,
+          approximate_age: invalid_approximate_age,
+          approximate_age_units: invalid_approximate_age_units,
+          roles: ['Victim']
+      end
+      let(:error_messages) do
+        ['Alleged victims must be under 18 years old.']
+      end
+
+      context 'when roles does not include Victim' do
+        let(:person) do
+          FactoryGirl.create :participant,
+            date_of_birth: invalid_date_of_birth,
+            roles: ['Family Member']
+        end
+
+        scenario 'error not displayed even if approximate age is over 18 years' do
+          stub_request(
+            :put,
+            intake_api_url(ExternalRoutes.intake_api_participant_path(person.id))
+          ).and_return(json_body(person.to_json))
+
+          within('.card.edit', text: person_name) { click_button 'Save' }
+
+          within('.card.show', text: person_name) do
+            error_messages.each do |message|
+              expect(page).not_to have_content(message, count: 1)
+            end
+            click_link 'Edit'
+          end
+
+          within('.card.edit', text: person_name) do
+            fill_in 'Approximate Age', with: valid_approximate_age
+            error_messages.each do |message|
+              expect(page).not_to have_content(message, count: 1)
+            end
+          end
+        end
+      end
+
+      context 'when multiple roles and include victim' do
+        let(:person) do
+          FactoryGirl.create :participant,
+            date_of_birth: invalid_date_of_birth,
+            approximate_age: invalid_approximate_age,
+            approximate_age_units: invalid_approximate_age_units,
+            roles: ['Victim', 'Family Member']
+        end
+
+        scenario 'error is displayed until user enters a valid approximate age' do
+          expect(page).to have_content person_name
+          validate_message_as_user_interacts_with_person_card(
+            person: person,
+            error_messages: error_messages,
+            person_updates: {
+              approximate_age: valid_approximate_age,
+              approximate_age_units: valid_approximate_age_units
+            }
+          ) do
+            within edit_participant_card_selector(person.id) do
+              fill_in 'Approximate Age', with: valid_approximate_age
+              select 'Weeks', from: 'approximate_age_units'
+            end
+          end
+        end
+
+        scenario 'error is not displayed if the victim role is removed' do
+          expect(page).to have_content person_name
+          validate_message_as_user_interacts_with_person_card(
+            person: person,
+            error_messages: error_messages,
+            person_updates: { roles: [] }
+          ) do
+            within edit_participant_card_selector(person.id) do
+              remove_react_select_option('Role', 'Victim')
+            end
+          end
+        end
+      end
+
+      scenario 'error is displayed until user enters a valid approximate age' do
+        expect(page).to have_content person_name
+        validate_message_as_user_interacts_with_person_card(
+          person: person,
+          error_messages: error_messages,
+          person_updates: {
+            approximate_age: valid_approximate_age,
+            approximate_age_units: valid_approximate_age_units
+          }
+        ) do
+          within edit_participant_card_selector(person.id) do
+            fill_in 'Approximate Age', with: valid_approximate_age
+            select 'Weeks', from: 'approximate_age_units'
+          end
+        end
+      end
+    end
+
+    context 'Alleged victims age is not under 18 years based on given date of birth' do
+      let(:invalid_date_of_birth) { nil }
+      let(:valid_date_of_birth) { Time.new(2002, 12, 13) }
+      let(:person) do
+        FactoryGirl.create :participant,
+          date_of_birth: invalid_date_of_birth,
+          roles: ['Victim']
+      end
+      let(:error_messages) do
+        ['Alleged victims must be under 18 years old.']
+      end
+
+      scenario 'error is displayed until user enters a valid date of birth' do
+        expect(page).to have_content person_name
+        validate_message_as_user_interacts_with_person_card(
+          person: person,
+          error_messages: error_messages,
+          person_updates: { date_of_birth: valid_date_of_birth }
+        ) do
+          within edit_participant_card_selector(person.id) do
+            fill_in_datepicker 'Date of birth', with: Time.new(2002, 12, 13)
+          end
+        end
+      end
+
+      context 'when roles does not include Victim' do
+        let(:person) do
+          FactoryGirl.create :participant,
+            date_of_birth: invalid_date_of_birth,
+            roles: ['Family Member']
+        end
+
+        scenario 'error not displayed even if dob is over 18 years' do
+          stub_request(
+            :put,
+            intake_api_url(ExternalRoutes.intake_api_participant_path(person.id))
+          ).and_return(json_body(person.to_json))
+
+          within('.card.edit', text: person_name) { click_button 'Save' }
+
+          within('.card.show', text: person_name) do
+            error_messages.each do |message|
+              expect(page).not_to have_content(message, count: 1)
+            end
+            click_link 'Edit'
+          end
+
+          within('.card.edit', text: person_name) do
+            fill_in_datepicker 'Date of birth', with: Time.new(1987, 12, 13)
+            error_messages.each do |message|
+              expect(page).not_to have_content(message, count: 1)
+            end
+          end
+        end
+      end
+
+      context 'when multiple roles include victim' do
+        let(:person) do
+          FactoryGirl.create :participant,
+            date_of_birth: invalid_date_of_birth,
+            roles: ['Victim', 'Family Member']
+        end
+
+        scenario 'error is displayed until user enters a valid date of birth' do
+          validate_message_as_user_interacts_with_person_card(
+            person: person,
+            error_messages: error_messages,
+            person_updates: { date_of_birth: valid_date_of_birth }
+          ) do
+            within edit_participant_card_selector(person.id) do
+              fill_in_datepicker 'Date of birth', with: Time.new(2002, 12, 13)
+            end
+          end
+        end
+
+        scenario 'error is not displayed if the victim role is removed' do
+          expect(page).to have_content person_name
+          validate_message_as_user_interacts_with_person_card(
+            person: person,
+            error_messages: error_messages,
+            person_updates: { roles: [] }
+          ) do
+            within edit_participant_card_selector(person.id) do
+              remove_react_select_option('Role', 'Victim')
+            end
+          end
+        end
+      end
+    end
+  end
+
   context 'victim first name is not present' do
     let(:invalid_first_name) { nil }
     let(:valid_first_name) { 'John' }
