@@ -7,6 +7,7 @@ import {dateFormatter} from 'utils/dateFormatter'
 import {flagPrimaryLanguage} from 'common/LanguageInfo'
 import US_STATE from 'enums/USState'
 import {isRequiredIfCreate, combineCompact} from 'utils/validator'
+import moment from 'moment'
 
 export const getNamesRequiredSelector = (state, personId) => {
   const person = state.get('participants').find((person) => person.get('id') === personId) || Map()
@@ -39,6 +40,40 @@ const VALID_SSN_LENGTH = 9
 const SSN_MIDDLE_SECTION_START = 3
 const SSN_MIDDLE_SECTION_END = 5
 
+export const getScreeningStartDate = (state) => state.get(['screeningInformationForm', 'started_at'])
+
+export const getAgeByApproximateAgeSelector = (state, personId) => {
+  const person = state.get('participants').find((person) => person.get('id') === personId) || Map()
+  const approximateAge = person.get('approximate_age')
+  const approximateAgeUnit = person.get('approximate_age_units')
+  const amountInYears = {
+    years: 1,
+    months: 12,
+    weeks: 52,
+    days: 365,
+  }
+  if (approximateAge) {
+    return approximateAge / amountInYears[approximateAgeUnit]
+  }
+  return undefined
+}
+
+export const getAgeByDateOfBirth = (state, personId) => {
+  const person = state.get('participants').find((person) => person.get('id') === personId) || Map()
+  const dateOfBirth = person.get('date_of_birth') || ''
+  if (dateOfBirth) {
+    return moment().diff(dateOfBirth, 'years')
+  }
+  return undefined
+}
+
+export const isUnder18YearsOfAgeAtScreeningDate = (state, personId) => {
+  const screeningStartDateInYears = moment().diff(getScreeningStartDate(state), 'years')
+  const ageFromScreeningDate = (getAgeByDateOfBirth(state, personId) || getAgeByApproximateAgeSelector(state, personId)) - screeningStartDateInYears
+  const underAgeLimit = 18
+  return !isNaN(ageFromScreeningDate) && ageFromScreeningDate < underAgeLimit
+}
+
 export const getErrorsSelector = (state, personId) => {
   const person = state.get('participants').find((person) => person.get('id') === personId) || Map()
   const ssn = person.get('ssn') || ''
@@ -50,6 +85,15 @@ export const getErrorsSelector = (state, personId) => {
     name: combineCompact(
       isRequiredIfCreate(firstName, 'Please enter a first name.', () => (roles.includes('Victim') || roles.includes('Collateral'))),
       isRequiredIfCreate(lastName, 'Please enter a last name.', () => (roles.includes('Victim') || roles.includes('Collateral')))
+    ),
+    roles: combineCompact(
+      () => {
+        if (roles.includes('Victim') && !isUnder18YearsOfAgeAtScreeningDate(state, personId)) {
+          return 'Alleged victims must be under 18 years old.'
+        } else {
+          return undefined
+        }
+      }
     ),
     ssn: combineCompact(
       () => {
@@ -117,7 +161,7 @@ export const getFormattedPersonInformationSelector = (state, personId) => {
       required: getNamesRequiredSelector(state, personId),
     }),
     races: races,
-    roles: person.get('roles', List()),
+    roles: {value: person.get('roles', List()), errors: errors.get('roles')},
     ssn: {value: ssnFormatter(person.get('ssn')), errors: errors.get('ssn')},
     alertErrorMessage: getPersonAlertErrorMessageSelector(state, personId),
   })
