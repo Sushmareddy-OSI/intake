@@ -27,6 +27,10 @@ import {
   getTouchedFieldsForPersonSelector,
   getVisibleErrorsSelector,
   getSocialSecurityNumberSelector,
+  getRolesSelector,
+  getAgeByApproximateAgeSelector,
+  getAgeByDateOfBirth,
+  isUnder18YearsOfAgeAtScreeningDate,
 } from 'selectors/screening/peopleFormSelectors'
 import * as matchers from 'jasmine-immutable-matchers'
 
@@ -774,11 +778,13 @@ describe('peopleFormSelectors', () => {
       const state = fromJS({peopleForm})
       expect(getErrorsSelector(state, '1').get('last_name').first()).toEqual('Please enter a last name.')
     })
+
     it('returns first name error if first name is empty and role includes Victim', () => {
       const peopleForm = {1: {last_name: {value: 'Smith', errors: []}, roles: {value: ['Victim']}}}
       const state = fromJS({peopleForm})
       expect(getErrorsSelector(state, '1').get('first_name').first()).toEqual('Please enter a first name.')
     })
+
     it('returns undefined if first name is not empty and role includes Victim', () => {
       const peopleForm = {1: {
         first_name: {value: 'John', errors: []},
@@ -786,6 +792,7 @@ describe('peopleFormSelectors', () => {
       const state = fromJS({peopleForm})
       expect(getErrorsSelector(state, '1').get('first_name').first()).toEqual(undefined)
     })
+
     it('returns undefined if last name is not empty and role includes Victim', () => {
       const peopleForm = {1: {
         last_name: {value: 'John', errors: []},
@@ -793,15 +800,97 @@ describe('peopleFormSelectors', () => {
       const state = fromJS({peopleForm})
       expect(getErrorsSelector(state, '1').get('last_name').first()).toEqual(undefined)
     })
+
     it('returns undefined if first name is empty and role does not include Victim', () => {
       const peopleForm = {1: {roles: {value: ['Some role']}}}
       const state = fromJS({peopleForm})
       expect(getErrorsSelector(state, '1').get('first_name').first()).toEqual(undefined)
     })
+
     it('returns undefined if last name is empty and role does not include Victim', () => {
       const peopleForm = {1: {roles: {value: ['Some role']}}}
       const state = fromJS({peopleForm})
       expect(getErrorsSelector(state, '1').get('last_name').first()).toEqual(undefined)
+    })
+
+    describe('roles in getErrorsSelector', () => {
+      it('returns roles error if role includes Victim and date of birth or approximate age is empty', () => {
+        const peopleForm = {1: {roles: {value: ['Victim'], errors: []}}}
+        const state = fromJS({peopleForm})
+        expect(getErrorsSelector(state, '1').get('roles').first()).toEqual('Alleged victims must be under 18 years old.')
+      })
+
+      it('does not return roles error if role includes Victim and date of birth or approximate age is given', () => {
+        const peopleForm = {1: {date_of_birth: {value: '12/24/2001'}, roles: {value: ['Victim'], errors: []}}}
+        const state = fromJS({peopleForm})
+        expect(getErrorsSelector(state, '1').get('roles')).toEqualImmutable(List())
+      })
+    })
+  })
+
+  describe('getRolesSelector', () => {
+    it('returns roles with error if it has one', () => {
+      const peopleForm = {
+        1: {roles: {value: 'Victim', errors: []}},
+        2: {roles: {value: 'Collateral', errors: []}},
+      }
+      const state = fromJS({peopleForm})
+      expect(getRolesSelector(state, '1')).toEqualImmutable(fromJS(
+        {
+          value: 'Victim',
+          errors: [],
+        }))
+      expect(getRolesSelector(state, '2')).toEqualImmutable(fromJS(
+        {
+          value: 'Collateral',
+          errors: [],
+        }))
+    })
+  })
+
+  describe('getAgeByApproximateAgeSelector', () => {
+    it('returns age in years based on approximate age and unit', () => {
+      const peopleForm = {
+        1: {approximate_age: {value: '17'}, approximate_age_units: {value: 'years'}},
+        2: {approximate_age: {value: '96'}, approximate_age_units: {value: 'months'}},
+        3: {approximate_age: {value: '156'}, approximate_age_units: {value: 'weeks'}},
+        4: {approximate_age: {value: '1460'}, approximate_age_units: {value: 'days'}},
+      }
+      const state = fromJS({peopleForm})
+      expect(getAgeByApproximateAgeSelector(state, '1')).toEqual(17)
+      expect(getAgeByApproximateAgeSelector(state, '2')).toEqual(8)
+      expect(getAgeByApproximateAgeSelector(state, '3')).toEqual(3)
+      expect(getAgeByApproximateAgeSelector(state, '4')).toEqual(4)
+    })
+  })
+
+  describe('getAgeByDateOfBirth', () => {
+    it('returns age in years based on date of birth', () => {
+      const peopleForm = {1: {date_of_birth: {value: '12/24/1999'}}}
+      const state = fromJS({peopleForm})
+      expect(getAgeByDateOfBirth(state, '1')).toEqual(18)
+    })
+  })
+
+  describe('isUnder18YearsOfAgeAtScreeningDate', () => {
+    it('returns boolean value as true if approximate age with unit at screening date is under 18 years or returns false', () => {
+      const peopleForm = {
+        1: {approximate_age: {value: '18'}, approximate_age_units: {value: 'years'}},
+        2: {approximate_age: {value: '17'}, approximate_age_units: {value: 'years'}},
+      }
+      const state = fromJS({peopleForm})
+      expect(isUnder18YearsOfAgeAtScreeningDate(state, '1')).toEqual(false)
+      expect(isUnder18YearsOfAgeAtScreeningDate(state, '2')).toEqual(true)
+    })
+
+    it('returns boolean value as false if date of birth at screening date is under 18 years or returns false', () => {
+      const peopleForm = {
+        1: {date_of_birth: {value: '12/24/1998'}},
+        2: {date_of_birth: {value: '12/24/2004'}},
+      }
+      const state = fromJS({peopleForm})
+      expect(isUnder18YearsOfAgeAtScreeningDate(state, '1')).toEqual(false)
+      expect(isUnder18YearsOfAgeAtScreeningDate(state, '2')).toEqual(true)
     })
   })
 

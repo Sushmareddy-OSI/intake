@@ -6,6 +6,7 @@ import {createSelector} from 'reselect'
 import {fromJS, List, Map} from 'immutable'
 import {ROLE_TYPE_NON_REPORTER, ROLE_TYPE_REPORTER} from 'enums/RoleType'
 import {isRequiredIfCreate, combineCompact} from 'utils/validator'
+import moment from 'moment'
 
 const VALID_SSN_LENGTH = 9
 const SSN_MIDDLE_SECTION_START = 3
@@ -14,12 +15,46 @@ const formatEnums = (enumObject) =>
   Object.keys(enumObject).map((item) => ({label: enumObject[item], value: item}))
 
 export const getPeopleSelector = (state) => state.get('peopleForm')
+export const getScreeningStartDate = (state) => state.getIn(['screeningInformationForm', 'started_at', 'value'])
+
 import {getScreeningIdValueSelector} from 'selectors/screeningSelectors'
 import PHONE_NUMBER_TYPE from 'enums/PhoneNumberType'
 import ADDRESS_TYPE from 'enums/AddressType'
 import US_STATE from 'enums/USState'
 import {RACE_DETAILS} from 'enums/Races'
 import {ETHNICITY_DETAILS} from 'enums/Ethnicity'
+
+export const getAgeByApproximateAgeSelector = (state, personId) => {
+  const person = state.getIn(['peopleForm', personId])
+  const approximateAge = person.getIn(['approximate_age', 'value'])
+  const approximateAgeUnit = person.getIn(['approximate_age_units', 'value'])
+  const amountInYears = {
+    years: 1,
+    months: 12,
+    weeks: 52,
+    days: 365,
+  }
+  if (approximateAge) {
+    return approximateAge / amountInYears[approximateAgeUnit]
+  }
+  return undefined
+}
+
+export const getAgeByDateOfBirth = (state, personId) => {
+  const person = state.getIn(['peopleForm', personId])
+  const dateOfBirth = person.getIn(['date_of_birth', 'value']) || ''
+  if (dateOfBirth) {
+    return moment().diff(dateOfBirth, 'years')
+  }
+  return undefined
+}
+
+export const isUnder18YearsOfAgeAtScreeningDate = (state, personId) => {
+  const screeningStartDateInYears = moment().diff(getScreeningStartDate(state), 'years')
+  const ageFromScreeningDate = (getAgeByDateOfBirth(state, personId) || getAgeByApproximateAgeSelector(state, personId)) - screeningStartDateInYears
+  const underAgeLimit = 18
+  return !isNaN(ageFromScreeningDate) && ageFromScreeningDate < underAgeLimit
+}
 
 export const getErrorsSelector = (state, personId) => {
   const person = state.getIn(['peopleForm', personId]) || Map()
@@ -29,6 +64,7 @@ export const getErrorsSelector = (state, personId) => {
   const ssn = person.getIn(['ssn', 'value']) || ''
   const ssnWithoutHyphens = ssn.replace(/-|_/g, '')
   return fromJS({
+    roles: combineCompact(isRequiredIfCreate(roles.value, 'Alleged victims must be under 18 years old.', () => (roles.includes('Victim') && !isUnder18YearsOfAgeAtScreeningDate(state, personId)))),
     first_name: combineCompact(isRequiredIfCreate(firstName, 'Please enter a first name.', () => (roles.includes('Victim') || roles.includes('Collateral')))),
     last_name: combineCompact(isRequiredIfCreate(lastName, 'Please enter a last name.', () => (roles.includes('Victim') || roles.includes('Collateral')))),
     ssn: combineCompact(
@@ -90,6 +126,15 @@ export const getVisibleErrorsSelector = (state, personId) => {
 export const getNamesRequiredSelector = (state, personId) => {
   const roles = state.getIn(['peopleForm', personId, 'roles', 'value'], List())
   return (roles.includes('Victim') || roles.includes('Collateral'))
+}
+
+export const getRolesSelector = (state, personId) => {
+  const value = state.getIn(['peopleForm', personId, 'roles', 'value'], List())
+  const errors = getVisibleErrorsSelector(state, personId).get('roles')
+  return fromJS({
+    value: value || '',
+    errors: errors,
+  })
 }
 
 export const getFirstNameSelector = (state, personId) => {
