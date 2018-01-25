@@ -1,6 +1,7 @@
 import {
   getInPersonCommunicationMethodValueSelector,
   getOfficeLocationCodeValueSelector,
+  getAddressCountiesSelector,
 } from 'selectors/systemCodeSelectors'
 import {fromJS} from 'immutable'
 
@@ -27,5 +28,13 @@ describe('getOfficeLocationCodeValueSelector', () => {
   it('returns undefined when locations are empty', () => {
     const state = fromJS({locations: []})
     expect(getOfficeLocationCodeValueSelector(state)).toEqual(undefined)
+  })
+})
+describe('getAddressCountiesSelector', () => {
+  it('return a list of address counties', () => {
+    const addressCounties = [{county_code: '99', value: 'State Of California'}]
+    const otherSystemCodes = [{county_code: '1', value: 'invalid'}]
+    const state = fromJS({addressCounties, otherSystemCodes})
+    expect(getAddressCountiesSelector(state).toJS()).toEqual(addressCounties)
   })
 })
