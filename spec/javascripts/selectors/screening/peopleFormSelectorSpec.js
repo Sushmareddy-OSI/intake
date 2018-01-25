@@ -28,8 +28,6 @@ import {
   getVisibleErrorsSelector,
   getSocialSecurityNumberSelector,
   getRolesSelector,
-  getAgeByApproximateAgeSelector,
-  getAgeByDateOfBirth,
   isUnder18YearsOfAgeAtScreeningDate,
 } from 'selectors/screening/peopleFormSelectors'
 import * as matchers from 'jasmine-immutable-matchers'
@@ -845,30 +843,6 @@ describe('peopleFormSelectors', () => {
           value: 'Collateral',
           errors: [],
         }))
-    })
-  })
-
-  describe('getAgeByApproximateAgeSelector', () => {
-    it('returns age in years based on approximate age and unit', () => {
-      const peopleForm = {
-        1: {approximate_age: {value: '17'}, approximate_age_units: {value: 'years'}},
-        2: {approximate_age: {value: '96'}, approximate_age_units: {value: 'months'}},
-        3: {approximate_age: {value: '156'}, approximate_age_units: {value: 'weeks'}},
-        4: {approximate_age: {value: '1460'}, approximate_age_units: {value: 'days'}},
-      }
-      const state = fromJS({peopleForm})
-      expect(getAgeByApproximateAgeSelector(state, '1')).toEqual(17)
-      expect(getAgeByApproximateAgeSelector(state, '2')).toEqual(8)
-      expect(getAgeByApproximateAgeSelector(state, '3')).toEqual(3)
-      expect(getAgeByApproximateAgeSelector(state, '4')).toEqual(4)
-    })
-  })
-
-  describe('getAgeByDateOfBirth', () => {
-    it('returns age in years based on date of birth', () => {
-      const peopleForm = {1: {date_of_birth: {value: '12/24/1999'}}}
-      const state = fromJS({peopleForm})
-      expect(getAgeByDateOfBirth(state, '1')).toEqual(18)
     })
   })
 

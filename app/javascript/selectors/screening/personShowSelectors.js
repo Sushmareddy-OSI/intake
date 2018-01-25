@@ -40,7 +40,7 @@ const VALID_SSN_LENGTH = 9
 const SSN_MIDDLE_SECTION_START = 3
 const SSN_MIDDLE_SECTION_END = 5
 
-export const getScreeningStartDate = (state) => state.get(['screeningInformationForm', 'started_at'])
+export const getScreeningStartDateSelector = (state) => state.get(['screeningInformationForm', 'started_at'])
 
 export const getAgeByApproximateAgeSelector = (state, personId) => {
   const person = state.get('participants').find((person) => person.get('id') === personId) || Map()
@@ -68,7 +68,7 @@ export const getAgeByDateOfBirth = (state, personId) => {
 }
 
 export const isUnder18YearsOfAgeAtScreeningDate = (state, personId) => {
-  const screeningStartDateInYears = moment().diff(getScreeningStartDate(state), 'years')
+  const screeningStartDateInYears = moment().diff(getScreeningStartDateSelector(state), 'years')
   const ageFromScreeningDate = (getAgeByDateOfBirth(state, personId) || getAgeByApproximateAgeSelector(state, personId)) - screeningStartDateInYears
   const underAgeLimit = 18
   return !isNaN(ageFromScreeningDate) && ageFromScreeningDate < underAgeLimit
