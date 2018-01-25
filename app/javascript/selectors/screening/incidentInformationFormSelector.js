@@ -1,4 +1,3 @@
-import COUNTIES from 'enums/Counties'
 import US_STATE from 'enums/USState'
 import LOCATION_TYPE from 'enums/LocationType'
 import {createSelector} from 'reselect'
@@ -8,8 +7,6 @@ import {isFutureDatetimeCreate, combineCompact} from 'utils/validator'
 
 export const getIncidentInformationFormSelector = (state) => state.get('incidentInformationForm', Map())
 
-export const getDefaultIncidentCountySelector = (state) => Object.keys(COUNTIES).find((key) => COUNTIES[key] === state.getIn(['userInfo', 'county']))
-
 export const getIncidentDateSelector = createSelector(
   getIncidentInformationFormSelector,
   (incidentInformationForm) => incidentInformationForm.getIn(['incident_date', 'value'], '') || ''
@@ -17,8 +14,7 @@ export const getIncidentDateSelector = createSelector(
 
 export const getIncidentCountySelector = createSelector(
   getIncidentInformationFormSelector,
-  getDefaultIncidentCountySelector,
-  (incidentInformationForm, defaultIncidentCounty) => defaultIncidentCounty || incidentInformationForm.getIn(['incident_county', 'value'])
+  (incidentInformationForm) => incidentInformationForm.getIn(['incident_county', 'value']) || ''
 )
 
 export const getAddressSelector = createSelector(
@@ -78,8 +74,8 @@ export const getVisibleErrorsSelector = createSelector(
   )
 )
 
-export const getCounties = () =>
-  Object.keys(COUNTIES).map((item) => ({key: item, name: COUNTIES[item]}))
+export const getCounties = (state) =>
+  (state.get('addressCounties').map((county) => ({key: county.get('code'), name: county.get('value')}))).toJS()
 
 export const getStates = () => US_STATE
 

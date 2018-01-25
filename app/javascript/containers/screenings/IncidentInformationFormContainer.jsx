@@ -29,7 +29,7 @@ const mapStateToProps = (state) => ({
   selectedCounty: getIncidentCountySelector(state),
   address: getAddressSelector(state).toJS(),
   selectedLocationType: getLocationTypeSelector(state),
-  counties: getCounties(),
+  counties: getCounties(state),
   usStates: getStates(),
   locationTypes: getLocationTypes(),
 })

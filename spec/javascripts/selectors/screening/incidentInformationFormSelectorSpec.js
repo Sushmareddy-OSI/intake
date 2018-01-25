@@ -7,6 +7,7 @@ import {
   getScreeningWithEditsSelector,
   getVisibleErrorsSelector,
 } from 'selectors/screening/incidentInformationFormSelector'
+import {getAddressCountiesSelector} from 'selectors/systemCodeSelectors'
 import * as matchers from 'jasmine-immutable-matchers'
 import moment from 'moment'
 
@@ -29,27 +30,21 @@ describe('incidentInformationFormSelectors', () => {
   })
 
   describe('getIncidentCountySelector', () => {
-    it('return a default incident county from UserInfo if incidentInformationForm.incident_county is null', () => {
-      const incidentInformationForm = {
-        incident_county: null,
-      }
-      const userInfo = {
-        county: 'Alameda',
-      }
-      const state = fromJS({incidentInformationForm, userInfo})
-      expect(getIncidentCountySelector(state)).toEqual('alameda')
-    })
-    it('return an User Info county even if Incident Information has a incident county', () => {
+    it('return an incident county or undefined if there is no incident county', () => {
       const incidentInformationForm = {
         incident_county: {
-          value: 'yolo',
+          value: '99',
         },
       }
-      const userInfo = {
-        county: 'Alameda',
-      }
-      const state = fromJS({incidentInformationForm, userInfo})
-      expect(getIncidentCountySelector(state)).toEqual('alameda')
+      const addressCounties = [
+        {code: '01', value: 'San Francisco', category: 'address_county'},
+        {code: '02', value: 'Monterey', category: 'address_county'},
+        {code: '03', value: 'Sacramento', category: 'county_type'},
+        {code: '99', value: 'State Of California', category: 'address_county'},
+      ]
+      const state = fromJS({incidentInformationForm, addressCounties})
+      expect(getIncidentCountySelector(state, getAddressCountiesSelector)).toEqual('99')
+      expect(getIncidentCountySelector(emptyState, getAddressCountiesSelector)).toEqual('')
     })
   })
 
