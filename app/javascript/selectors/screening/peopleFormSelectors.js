@@ -40,8 +40,7 @@ export const isUnder18YearsOfAgeAtScreeningDate = (state, personId) => {
   }
 
   const underAgeLimit = 18
-  console.log('ageFromScreeningDate', ageFromScreeningDate)
-  return !isNaN(ageFromScreeningDate) && ageFromScreeningDate < underAgeLimit
+  return (typeof ageFromScreeningDate === 'number') && ageFromScreeningDate < underAgeLimit
 }
 
 export const getErrorsSelector = (state, personId) => {
@@ -56,8 +55,6 @@ export const getErrorsSelector = (state, personId) => {
     last_name: combineCompact(isRequiredIfCreate(lastName, 'Please enter a last name.', () => (roles.includes('Victim') || roles.includes('Collateral')))),
     roles: combineCompact(
       () => {
-        console.log('ROLE ERROR')
-        console.log('isUnder18YearsOfAgeAtScreeningDate', isUnder18YearsOfAgeAtScreeningDate(state, personId))
         if (roles.includes('Victim') && !isUnder18YearsOfAgeAtScreeningDate(state, personId)) {
           return 'Alleged victims must be under 18 years old.'
         } else {

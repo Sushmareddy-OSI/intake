@@ -847,24 +847,36 @@ describe('peopleFormSelectors', () => {
   })
 
   describe('isUnder18YearsOfAgeAtScreeningDate', () => {
-    it('returns boolean value as true if approximate age with unit at screening date is under 18 years or returns false', () => {
+    it('returns true if approximate age at screening date is under 18 years old', () => {
       const peopleForm = {
-        1: {approximate_age: {value: '18'}, approximate_age_units: {value: 'years'}},
-        2: {approximate_age: {value: '17'}, approximate_age_units: {value: 'years'}},
+        1: {approximate_age: {value: '17'}, approximate_age_units: {value: 'years'}},
       }
       const state = fromJS({peopleForm})
-      expect(isUnder18YearsOfAgeAtScreeningDate(state, '1')).toEqual(false)
-      expect(isUnder18YearsOfAgeAtScreeningDate(state, '2')).toEqual(true)
+      expect(isUnder18YearsOfAgeAtScreeningDate(state, '1')).toEqual(true)
     })
 
-    it('returns boolean value as false if date of birth at screening date is under 18 years or returns false', () => {
+    it('returns false if approximate age at screening date is over 18 years old', () => {
       const peopleForm = {
-        1: {date_of_birth: {value: '12/24/1998'}},
-        2: {date_of_birth: {value: '12/24/2004'}},
+        1: {approximate_age: {value: '18'}, approximate_age_units: {value: 'years'}},
       }
       const state = fromJS({peopleForm})
       expect(isUnder18YearsOfAgeAtScreeningDate(state, '1')).toEqual(false)
-      expect(isUnder18YearsOfAgeAtScreeningDate(state, '2')).toEqual(true)
+    })
+
+    it('returns true if date of birth at screening date is under 18 years old', () => {
+      const peopleForm = {
+        1: {date_of_birth: {value: '12/24/2004'}},
+      }
+      const state = fromJS({peopleForm})
+      expect(isUnder18YearsOfAgeAtScreeningDate(state, '1')).toEqual(true)
+    })
+
+    it('returns false if date of birth at screening date is over 18 years old', () => {
+      const peopleForm = {
+        1: {date_of_birth: {value: '12/24/1998'}},
+      }
+      const state = fromJS({peopleForm})
+      expect(isUnder18YearsOfAgeAtScreeningDate(state, '1')).toEqual(false)
     })
   })
 
