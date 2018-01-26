@@ -128,6 +128,7 @@ feature 'Create Screening' do
           middle_initial: 'B',
           last_name: 'Cool',
           county: 'Mendocino',
+          county_code: '23',
           staff_id: '1234'
         }
       end
@@ -138,6 +139,7 @@ feature 'Create Screening' do
         allow(LUID).to receive(:generate).and_return(['DQJIYK'])
         new_screening = FactoryGirl.create(
           :screening,
+          incident_county: '23',
           reference: 'DQJIYK',
           safety_alerts: [],
           safety_information: nil,
@@ -172,7 +174,12 @@ feature 'Create Screening' do
           expect(page).to have_content("Screening #{new_screening.id}")
         end
 
-        expect(page).to have_field('Incident County', with: 'mendocino', disabled: true)
+        expect(page).to have_field('Incident County', with: '23', disabled: true)
+
+        within '#incident-information-card' do
+          click_button 'Cancel'
+          expect(page).to have_content('Mendocino')
+        end
       end
     end
 
